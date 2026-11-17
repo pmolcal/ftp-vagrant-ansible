@@ -11,16 +11,16 @@ apt-get install -y ansible ansible-lint
 # Copiar ficheros de ansible y playbooks
 # Descomentar las siguientes líneas según vayamos teniendo los ficheros y
 # hacer `vagrant provision ansible`
-cp -vf /vagrant/ansible.cfg .              <--
-cp -vf /vagrant/inventory.yml .            <--
-cp -vf /vagrant/requirements.yml .         <--
+cp -vf /vagrant/ansible.cfg .              
+cp -vf /vagrant/inventory.yml .            
+cp -vf /vagrant/requirements.yml .         
 # cp -vrf /vagrant/dns .
 # cp -vrf /vagrant/web .
 # cp -vrf /vagrant/ftp .
 # chown vagrant:vagrant ./ftp/vars/vault.yml
 
 # Instalar dependencias de Ansible
-ansible-galaxy collection install -r requirements.yml     <--
+ansible-galaxy collection install -r requirements.yml     
 
 # Provisionar con Ansible
 # ansible-playbook dns/dns.yml
