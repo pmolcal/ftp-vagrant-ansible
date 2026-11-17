@@ -1,8 +1,8 @@
-\# FTP con Vagrant y Ansible
+&#x20;FTP con Vagrant y Ansible
 
 
 
-\## Objetivo
+* Objetivo
 
 
 
@@ -14,7 +14,7 @@ El objetivo es practicar como montar un servidor FTP seguro con usuarios y permi
 
 
 
-\## Herramientas
+* Herramientas
 
 
 
@@ -35,4 +35,38 @@ El objetivo es practicar como montar un servidor FTP seguro con usuarios y permi
 \- vsftpd:servidor FTP
 
 \- FileZilla o WinSCP:cliente para conectarse por FTP
+
+
+
+
+
+Instrucciones de uso
+
+
+
+* Requisitos
+
+
+
+\- Git:
+
+\- VirtualBox:
+
+\- Vagrant:
+
+
+
+* Pasos básicos
+
+
+
+1\. Clonar el repositorio: `git clone https://github.com/pmolcal/ftp-vagrant-ansible.git`
+
+2\. Crear las máquinas virtuales: `vagrant up`
+
+3\. Comprobar que están creadas: `vagrant status`
+
+4\. Entrar en la máquina de Ansible: `vagrant ssh ansible`
+
+5\. Configurar los servidores desde ahí: `ansible-playbook -i inventory.yml dns/dns.yml`, y lo mismo con `web/web.yml` y `ftp/ftp.yml`
 
