@@ -8,6 +8,14 @@ set -xeu
 apt-get update
 apt-get install -y ansible ansible-lint
 
+# Copiar las claves SSH de Vagrant a una carpeta propia con permisos correctos
+mkdir -p /home/vagrant/claves
+cp -vf /vagrant/.vagrant/machines/dns/virtualbox/private_key /home/vagrant/claves/dns_key
+cp -vf /vagrant/.vagrant/machines/negocio/virtualbox/private_key /home/vagrant/claves/negocio_key
+chown -R vagrant:vagrant /home/vagrant/claves
+chmod 700 /home/vagrant/claves
+chmod 600 /home/vagrant/claves/*
+
 # Copiar ficheros de ansible y playbooks
 # Descomentar las siguientes líneas según vayamos teniendo los ficheros y
 # hacer `vagrant provision ansible`
