@@ -22,7 +22,7 @@ chmod 600 /home/vagrant/claves/*
 cp -vf /vagrant/ansible.cfg .              
 cp -vf /vagrant/inventory.yml .            
 cp -vf /vagrant/requirements.yml .         
-# cp -vrf /vagrant/dns .
+cp -vrf /vagrant/dns .
 # cp -vrf /vagrant/web .
 # cp -vrf /vagrant/ftp .
 # chown vagrant:vagrant ./ftp/vars/vault.yml
