@@ -1,0 +1,10 @@
+options {
+    directory "/var/cache/bind";
+
+    // Recursion solo para el propio servidor y la red privada
+    recursion yes;
+    allow-recursion { 127.0.0.1; 192.168.57.0/24; };
+
+    listen-on { any; };
+    listen-on-v6 { any; };
+};
