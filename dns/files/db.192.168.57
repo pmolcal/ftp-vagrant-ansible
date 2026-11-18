@@ -1,0 +1,12 @@
+$TTL 86400
+@       IN      SOA     dns.pablo.test. admin.pablo.test. (
+                        1           ; serial
+                        3600        ; refresh
+                        1800        ; retry
+                        604800      ; expire
+                        86400 )     ; negative cache TTL
+
+@       IN      NS      dns.pablo.test.
+
+5       IN      PTR     dns.pablo.test.
+7       IN      PTR     negocio.pablo.test.
