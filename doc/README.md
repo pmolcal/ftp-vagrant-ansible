@@ -126,7 +126,7 @@ Genero las contraseñas de juan y ana en el formato que necesita Ansible.
 
 ![Contraseñas generadas](img/captura16_hashes_mkpasswd.png)
 
-Las guardo en un fichero protegido con contraseña para que no se puedan leer en GitHub. En este primer intento se me olvida poner las contraseñas de verdad, y luego me da problemas (lo cuento en el apartado 11).
+Las guardo en un fichero protegido con contraseña para que no se puedan leer en GitHub.
 
 ![Creando el fichero protegido](img/captura17_vault_view.png)
 
@@ -231,21 +231,3 @@ Dejo el proyecto preparado para que las tres instalaciones (DNS, web y FTP) se h
 Todas las tareas del tablero quedan en "Hecho".
 
 ![Tablero terminado](img/captura38_tablero_final.png)
-
----
-
-## 11. Problemas que me encuentro
-
-- Los usuarios no pueden entrar por FTP. El servidor dice que la contraseña es incorrecta. El fallo está en las contraseñas que guardo: la primera vez se me olvida ponerlas y la segunda se cuela algún carácter. Las genero de nuevo con cuidado y ya funciona.
-- Mi ordenador no encuentra `www.pablo.test`. Lo configuro para que los nombres de la práctica los pregunte al DNS de la práctica.
-- Me quedo sin espacio en el disco y las máquinas se pausan. Borro máquinas viejas de otras prácticas.
-- Las máquinas se quedan con la hora atrasada o sin internet después de una pausa. Reiniciándolas se arregla.
-- El Bloc de notas a veces no guarda bien los ficheros o les añade `.txt`. Me acostumbro a comprobarlos siempre.
-
----
-
-## 12. Conclusión
-
-Con esta práctica aprendo a montar un DNS, una web y un FTP seguro sin configurar nada a mano en los servidores: todo lo hace Ansible. También aprendo a comprobar que cada cosa funciona y a buscar la causa de los errores.
-
-La última prueba del enunciado es borrar todo y volver a crearlo desde el repositorio. La intento, pero la máquina negocio se queda bloqueada a mitad y no consigo terminarla.
