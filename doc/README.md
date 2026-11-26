@@ -241,7 +241,7 @@ ansible-vault create /vagrant/ftp/vars/vault.yml
 
 ![Creando el vault con nano](img/captura17_vault_view.png)
 
-En esta captura se ve mi primer intento, y tiene un fallo: dejé los marcadores `HASH_DE_JUAN` y `HASH_DE_ANA` en vez de los hashes reales. No me di cuenta hasta que nadie podía entrar por FTP. Lo explico en el apartado 11.
+En esta captura se ve mi primer intento. Me olvidé de cambiar los marcadores por los hashes de verdad, y más adelante eso me dio problemas al entrar por FTP. Lo cuento en el apartado 11.
 
 Una vez cifrado, el fichero empieza por `$ANSIBLE_VAULT;1.1;AES256` y el resto es ilegible:
 
@@ -415,35 +415,21 @@ Con el commit final (`Closes #29` … `Closes #40`), todas las issues pasaron a 
 
 ## 11. Problemas que me encontré y cómo los resolví
 
-**Nadie podía entrar por FTP (`530 Login incorrect`).** Fue el problema más largo. El registro de FileZilla mostraba que la resolución de nombres, la conexión y el TLS iban bien, y que el fallo llegaba justo después de `PASS`. En el journal de `negocio` aparecía `pam_unix(vsftpd:auth): authentication failure`, es decir, la contraseña no coincidía con el hash. Para salir de dudas comparé los hashes guardados con un script de Python (`crypt.crypt('ana', hash) == hash`) y los dos daban `False`. En el primer vault se habían quedado los marcadores, y en el segundo se coló algo al escribir la contraseña a ciegas en `mkpasswd`. Los regeneré sin teclear a ciegas:
+No todo salió a la primera. Estos son los problemas que tuve por el camino:
 
-```bash
-printf 'ana' | mkpasswd --method=sha-512 --stdin > /tmp/hash_ana.txt
-```
+**Los usuarios no podían entrar por FTP.** Fue el que más tiempo me llevó. FileZilla conectaba con el servidor y el cifrado funcionaba, pero al poner la contraseña el servidor decía que era incorrecta, tanto con ana como con juan. Al final descubrí que el problema estaba en las contraseñas que había guardado en el vault: en el primer intento me olvidé de cambiar los marcadores por las contraseñas de verdad, y en el segundo se me coló algún carácter al escribirlas. Las volví a generar con más cuidado, las guardé otra vez en el vault, lancé de nuevo el playbook y ya pudieron entrar los dos.
 
-Después reconstruí el YAML, lo cifré con `ansible-vault encrypt --vault-password-file`, relancé el playbook y la comprobación ya dio `True` para los dos.
+**Mi ordenador no encontraba los nombres de la práctica.** Desde el servidor DNS todo resolvía bien, pero el navegador no encontraba `www.pablo.test`. Tuve que configurar Windows para que, solo para los nombres terminados en `.test`, preguntara al DNS de la práctica. Así el resto de internet sigue funcionando con normalidad.
 
-**El aviso "The input password appears not to have been hashed".** Fue la primera pista de lo anterior. Ansible lo muestra cuando el valor de `password` no tiene el formato de un hash.
+**Me quedé sin espacio en el disco.** Las máquinas virtuales ocupan bastante y en un momento se me llenó el disco. VirtualBox pausaba las máquinas y una instalación se quedó a medias. Borré máquinas de prácticas antiguas que ya no usaba y reparé la instalación que se había cortado.
 
-**Windows no usaba el DNS de la práctica.** `nslookup` resolvía bien, pero `ping`, `curl` y el navegador no, porque `nslookup` habla directamente con el servidor que le digas y los demás programas usan el resolutor de Windows. Lo arreglé con una regla NRPT que envía solo el espacio `.test` a `192.168.57.5`, y vaciando la caché con `ipconfig /flushdns` como administrador:
+**La hora de las máquinas se desajustaba.** Cuando una máquina se quedaba en pausa, al volver tenía la hora atrasada y no podía descargar paquetes. Apagándola y encendiéndola de nuevo se solucionaba.
 
-```
-powershell -Command "Add-DnsClientNrptRule -Namespace '.test' -NameServers '192.168.57.5'"
-```
+**Una máquina se quedó sin internet.** Después de suspender el ordenador, `negocio` dejó de tener conexión y el playbook se quedaba esperando sin avanzar. Reiniciando esa máquina volvió a funcionar.
 
-**Disco lleno.** Con poco espacio, VirtualBox pausaba las máquinas y una instalación de `apt` se cortó (`dpkg was interrupted`). Liberé espacio borrando máquinas de prácticas antiguas y reparé `dpkg` desde Ansible.
+**El Bloc de notas me dio guerra.** A veces no guardaba los cambios o añadía `.txt` al nombre de los ficheros. Además, los ficheros escritos en Windows guardan los saltos de línea de otra forma que Linux, y eso hacía fallar los scripts. Me acostumbré a comprobar siempre que los ficheros se habían guardado bien y a convertirlos antes de usarlos en las máquinas.
 
-**El reloj atrasado.** Al volver de pausa, la hora de las máquinas se quedaba atrás y `apt-get update` fallaba con *Release file is not valid yet*. Un `vagrant halt --force` seguido de `vagrant up` la sincroniza.
-
-**negocio sin internet.** Después de suspender el PC, `apt-get update` daba `Temporary failure resolving 'deb.debian.org'` y el playbook se quedaba esperando. La interfaz NAT de VirtualBox se había quedado colgada, y `vagrant reload negocio` lo arregló.
-
-**El Bloc de notas y los finales de línea.** El Bloc de notas a veces añadía `.txt` a los ficheros sin extensión o no guardaba los cambios, así que lo comprobaba siempre con `dir` y `type`. Además, los ficheros que van a Linux tienen que tener finales de línea LF, no CRLF, o bash falla con `$'\r': command not found`. Los convertía con el `sed` de Git:
-
-```
-"C:\Program Files\Git\usr\bin\sed.exe" -i "s/\r$//" fichero
-```
-
-**Comandos en el sitio equivocado.** Al principio a veces lanzaba `git` dentro de la máquina virtual (`fatal: not a git repository`) o `mkpasswd` en `negocio` en lugar de en `ansible`. Aprendí a fijarme siempre en el prompt antes de ejecutar nada.
+**Ejecutar comandos en el sitio equivocado.** Al principio a veces escribía comandos de Git dentro de la máquina virtual, o lanzaba algo en `negocio` cuando tenía que ser en `ansible`. Aprendí a mirar siempre en qué máquina estaba antes de ejecutar nada.
 
 ---
 
@@ -471,6 +457,6 @@ powershell -Command "Add-DnsClientNrptRule -Namespace '.test' -NameServers '192.
 
 ## 14. Conclusión
 
-Lo que más valoro de la práctica es haber tratado la infraestructura como código: el estado de los tres servidores está descrito en ficheros versionados, y Ansible se encarga de llevarlos a ese estado de forma repetible. También he aprendido a comprobar cada requisito con la herramienta adecuada (`dig`, `curl`, `ss`, `openssl`, `journalctl`) y a seguir los errores hasta su causa en lugar de probar cosas a ciegas. El caso de las contraseñas del FTP es el mejor ejemplo: el problema no estaba ni en vsftpd ni en TLS, sino en un hash mal generado.
+Lo que más valoro de la práctica es haber tratado la infraestructura como código: el estado de los tres servidores está descrito en ficheros versionados, y Ansible se encarga de llevarlos a ese estado de forma repetible. También he aprendido a comprobar cada requisito con la herramienta adecuada (`dig`, `curl`, `ss`, `openssl`, `journalctl`) y a seguir los errores hasta su causa en lugar de probar cosas a ciegas. El caso de las contraseñas del FTP es el mejor ejemplo: el fallo no estaba en el servidor, sino en las contraseñas que yo había guardado.
 
 La última comprobación que pide el enunciado era borrar todo, clonar el repositorio y hacer `vagrant up`. La intenté: las máquinas se crearon y el DNS y la web se provisionaron solos, pero la máquina `negocio` se quedó bloqueada durante la tarea del certificado y no llegué a completar esa prueba.
